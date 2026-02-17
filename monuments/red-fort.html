@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taj Mahal - AR Experience</title>
+    <title>Red Fort - AR Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- MODEL-VIEWER: This loads 3D GLB models -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.1/model-viewer.min.js"></script>
+    <!-- THREE.JS for rendering GLB on canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     
     <style>
         model-viewer {
@@ -28,6 +31,9 @@
         }
         
         #arVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -39,6 +45,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -48,8 +55,8 @@
         <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
             <!-- Monument Info -->
             <div class="bg-gradient-to-r from-orange-100 to-amber-100 p-6">
-                <h1 class="text-3xl font-bold text-gray-900">🏰 Red Fort </h1>
-                <p class="text-lg text-gray-700">📍 Delhi, India </p>
+                <h1 class="text-3xl font-bold text-gray-900">🏯 Red Fort</h1>
+                <p class="text-lg text-gray-700">📍 Old Delhi, India </p>
             </div>
 
             <!-- 3D MODEL VIEWER - THIS LOADS THE GLB FILE -->
@@ -81,7 +88,7 @@
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-orange-50 p-4 rounded-lg">
                         <span class="text-sm font-semibold text-orange-600">BUILT IN</span>
-                        <p class="text-2xl font-bold text-gray-900">1648</p>
+                        <p class="text-2xl font-bold text-gray-900">1648 AD</p>
                     </div>
                     <div class="bg-orange-50 p-4 rounded-lg">
                         <span class="text-sm font-semibold text-orange-600">PERIOD</span>
@@ -92,19 +99,18 @@
                 <div class="mb-6">
                     <span class="text-sm font-semibold text-orange-600">📖 ABOUT</span>
                     <p class="text-gray-700 mt-2 leading-relaxed">
-                        The Red Fort is a UNESCO World Heritage Site in Delhi, India. 
-                        It was built by Mughal Emperor Shah Jahan and is known for its red sandstone walls and intricate architecture.
+                        The Red Fort, or Lal Qila, is a historic fortified palace located in the heart of Old Delhi, India. Built by Mughal Emperor Shah Jahan in 1648, it served as the main residence of the Mughal emperors for nearly 200 years. The fort is named for its massive enclosing walls of red sandstone, which stretch over two kilometres. Inside the walls lies a complex of palaces, halls, and gardens that reflect a fusion of Persian, Timurid, and Indian architectural styles. The fort witnessed several important historical events, including the announcement of India's independence on 15 August 1947, when Prime Minister Jawaharlal Nehru hoisted the national flag. The tradition continues to this day, with the Prime Minister addressing the nation from its ramparts every Independence Day. The Red Fort was declared a UNESCO World Heritage Site in 2007.
                     </p>
                 </div>
 
                 <div class="mb-6">
                     <span class="text-sm font-semibold text-orange-600">✨ ARCHITECTURAL HIGHLIGHTS</span>
                     <ul class="mt-2 space-y-2 text-gray-700">
-                        <li>• Built using red sandstone, giving it a strong and majestic look.</li>
-                        <li>• A mix of Mughal, Persian and Indian architecture.</li>
-                        <li>• Has beautiful buildings like Diwan-i-Aam and Diwan-i-Khas with fine carvings.</li>
-                        <li>• Designed with gardens, water channels and fountains for beauty and cooling.</li>
-                        <li>• Surrounded by huge protective walls for defense.</li>
+                        <li>• Massive red sandstone walls stretching over 2 kilometres.</li>
+                        <li>• Features iconic gateways — Lahori Gate and Delhi Gate.</li>
+                        <li>• Contains the ornate Diwan-i-Aam (Hall of Public Audience) and Diwan-i-Khas (Hall of Private Audience).</li>
+                        <li>• Blend of Persian, Timurid, and Indian Mughal architectural styles.</li>
+                        <li>• Site of India's Independence Day celebrations every year since 1947.</li>
                     </ul>
                 </div>
 
@@ -126,7 +132,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <span class="text-sm font-semibold text-blue-900">📸 AR OVERLAY MODE</span>
-                            <p class="text-sm text-blue-700">See 3D reconstruction on camera</p>
+                            <p class="text-sm text-blue-700">See 3D model overlaid on camera</p>
                         </div>
                         <button onclick="startAROverlay()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all">
                             🎯 Start AR
@@ -147,16 +153,16 @@
         </div>
     </div>
 
-    <!-- MODULE 1 & 4: AR OVERLAY WITH PHOTO CAPTURE -->
+    <!-- MODULE 1 & 4: AR OVERLAY WITH GLB MODEL -->
     <div id="arOverlay" class="hidden">
         <video id="arVideo" autoplay playsinline></video>
         <canvas id="arCanvas"></canvas>
         
         <!-- AR Controls -->
-        <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
             <div class="bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
-                <p class="font-semibold">🕌 Taj Mahal</p>
-                <p class="text-sm">AR Reconstruction Mode</p>
+                <p class="font-semibold">🏯 Red Fort</p>
+                <p class="text-sm">AR Mode - Position yourself in frame</p>
             </div>
             <button onclick="stopAROverlay()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold">
                 ❌ Close
@@ -164,7 +170,7 @@
         </div>
 
         <!-- Bottom Controls -->
-        <div class="absolute bottom-4 left-4 right-4">
+        <div class="absolute bottom-4 left-4 right-4 z-10">
             <div class="bg-black bg-opacity-70 p-4 rounded-lg">
                 <div class="flex justify-around items-center">
                     <button onclick="rotateModel(-15)" class="text-white flex flex-col items-center">
@@ -173,7 +179,7 @@
                     </button>
                     <button onclick="scaleModel(-0.1)" class="text-white flex flex-col items-center">
                         <span class="text-2xl">−</span>
-                        <span class="text-xs">Zoom Out</span>
+                        <span class="text-xs">Smaller</span>
                     </button>
                     
                     <!-- MODULE 4: PHOTO CAPTURE -->
@@ -183,12 +189,18 @@
                     
                     <button onclick="scaleModel(0.1)" class="text-white flex flex-col items-center">
                         <span class="text-2xl">+</span>
-                        <span class="text-xs">Zoom In</span>
+                        <span class="text-xs">Bigger</span>
                     </button>
                     <button onclick="rotateModel(15)" class="text-white flex flex-col items-center">
                         <span class="text-2xl">↻</span>
                         <span class="text-xs">Rotate Right</span>
                     </button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <button onclick="moveModel(0, -20)" class="flex-1 bg-gray-700 text-white py-2 rounded">⬆️ Up</button>
+                    <button onclick="moveModel(0, 20)" class="flex-1 bg-gray-700 text-white py-2 rounded">⬇️ Down</button>
+                    <button onclick="moveModel(-20, 0)" class="flex-1 bg-gray-700 text-white py-2 rounded">⬅️ Left</button>
+                    <button onclick="moveModel(20, 0)" class="flex-1 bg-gray-700 text-white py-2 rounded">➡️ Right</button>
                 </div>
             </div>
         </div>
@@ -216,7 +228,7 @@
     <script>
         // MODULE 3: AUDIO GUIDE (Text-to-Speech)
         let isPlaying = false;
-        const audioScript = " The Red Fort is one of the most famous monuments in India, located in Delhi. It was built by Mughal emperor Shah Jahan in 1648. The fort is made mainly of red sandstone, which gives it its name and strong appearance. Inside the fort are beautiful buildings like Diwan-i-Aam and Diwan-i-Khas, decorated with carvings and marble work. The fort also has gardens and water channels that kept the palace cool. Today, the Red Fort is a symbol of India’s history and independence";
+        const audioScript = "The Red Fort, or Lal Qila, is a historic fortified palace located in the heart of Old Delhi, India. Built by Mughal Emperor Shah Jahan in 1648, it served as the main residence of the Mughal emperors for nearly 200 years. The fort is named for its massive enclosing walls of red sandstone, which stretch over two kilometres. Inside the walls lies a complex of palaces, halls, and gardens that reflect a fusion of Persian, Timurid, and Indian architectural styles. The fort witnessed several important historical events, including the announcement of India's independence on 15 August 1947, when Prime Minister Jawaharlal Nehru hoisted the national flag. The tradition continues to this day, with the Prime Minister addressing the nation from its ramparts every Independence Day. The Red Fort was declared a UNESCO World Heritage Site in 2007.";
 
         function toggleAudio() {
             const btn = document.getElementById('audioBtn');
@@ -239,12 +251,16 @@
             }
         }
 
-        // MODULE 1: AR OVERLAY
+        // MODULE 1 & 4: AR OVERLAY WITH THREE.JS GLB RENDERING
         let arStream = null;
         let arCanvas, arCtx, arVideo;
+        let scene, camera, renderer, glbModel;
         let rotation = 0;
         let scale = 1;
+        let posX = 0;
+        let posY = 0;
         let animationId;
+        let modelLoaded = false;
 
         async function startAROverlay() {
             try {
@@ -263,6 +279,8 @@
                 arVideo.onloadedmetadata = () => {
                     arCanvas.width = arVideo.videoWidth;
                     arCanvas.height = arVideo.videoHeight;
+                    initThreeJS();
+                    loadGLBModel();
                     drawAROverlay();
                 };
             } catch (err) {
@@ -271,65 +289,77 @@
             }
         }
 
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            
+            camera = new THREE.PerspectiveCamera(75, arCanvas.width / arCanvas.height, 0.1, 1000);
+            camera.position.z = 5;
+            
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(arCanvas.width, arCanvas.height);
+            renderer.setClearColor(0x000000, 0);
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            directionalLight.position.set(5, 10, 5);
+            scene.add(directionalLight);
+        }
+
+        function loadGLBModel() {
+            const loader = new THREE.GLTFLoader();
+            
+            loader.load(
+                '../models/red-fort.glb',
+                function(gltf) {
+                    glbModel = gltf.scene;
+                    
+                    const box = new THREE.Box3().setFromObject(glbModel);
+                    const center = box.getCenter(new THREE.Vector3());
+                    glbModel.position.sub(center);
+                    
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scaleVal = 3 / maxDim;
+                    glbModel.scale.set(scaleVal, scaleVal, scaleVal);
+                    
+                    scene.add(glbModel);
+                    modelLoaded = true;
+                    console.log('GLB model loaded successfully');
+                },
+                function(xhr) {
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+                function(error) {
+                    console.error('Error loading GLB model:', error);
+                    alert('Could not load 3D model. Please check the file path.');
+                }
+            );
+        }
+
         function drawAROverlay() {
             if (!arStream) return;
             
             arCtx.clearRect(0, 0, arCanvas.width, arCanvas.height);
             
-            const centerX = arCanvas.width / 2;
-            const centerY = arCanvas.height / 2;
-            
-            arCtx.save();
-            arCtx.translate(centerX, centerY);
-            arCtx.rotate((rotation * Math.PI) / 180);
-            arCtx.scale(scale, scale);
-            
-            // Draw Taj Mahal
-            drawTajMahal(arCtx);
-            
-            arCtx.restore();
+            if (modelLoaded && glbModel) {
+                glbModel.rotation.y = (rotation * Math.PI) / 180;
+                glbModel.scale.set(scale, scale, scale);
+                glbModel.position.x = posX / 100;
+                glbModel.position.y = -posY / 100;
+                
+                renderer.render(scene, camera);
+                
+                arCtx.drawImage(renderer.domElement, 0, 0);
+            } else {
+                arCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                arCtx.font = 'bold 24px Arial';
+                arCtx.textAlign = 'center';
+                arCtx.fillText('Loading 3D Model...', arCanvas.width / 2, arCanvas.height / 2);
+            }
             
             animationId = requestAnimationFrame(drawAROverlay);
-        }
-
-        function drawTajMahal(ctx) {
-            // Main structure
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.strokeStyle = '#d4af37';
-            ctx.lineWidth = 3;
-            
-            // Base
-            ctx.fillRect(-100, 20, 200, 40);
-            ctx.strokeRect(-100, 20, 200, 40);
-            
-            // Main building
-            ctx.fillRect(-80, -40, 160, 60);
-            ctx.strokeRect(-80, -40, 160, 60);
-            
-            // Central dome
-            ctx.beginPath();
-            ctx.ellipse(0, -60, 50, 30, 0, Math.PI, 0);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Spire
-            ctx.beginPath();
-            ctx.moveTo(-10, -90);
-            ctx.lineTo(0, -110);
-            ctx.lineTo(10, -90);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Minarets
-            [-90, 90].forEach(x => {
-                ctx.fillRect(x - 8, -30, 16, 70);
-                ctx.strokeRect(x - 8, -30, 16, 70);
-                ctx.beginPath();
-                ctx.arc(x, -35, 10, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-            });
         }
 
         function rotateModel(angle) {
@@ -337,7 +367,12 @@
         }
 
         function scaleModel(delta) {
-            scale = Math.max(0.5, Math.min(2, scale + delta));
+            scale = Math.max(0.3, Math.min(3, scale + delta));
+        }
+
+        function moveModel(deltaX, deltaY) {
+            posX += deltaX;
+            posY += deltaY;
         }
 
         function stopAROverlay() {
@@ -351,6 +386,18 @@
             document.getElementById('arOverlay').classList.add('hidden');
             rotation = 0;
             scale = 1;
+            posX = 0;
+            posY = 0;
+            modelLoaded = false;
+            
+            if (renderer) {
+                renderer.dispose();
+                renderer = null;
+            }
+            if (scene) {
+                scene.clear();
+                scene = null;
+            }
         }
 
         // MODULE 4: PHOTO CAPTURE
@@ -362,20 +409,19 @@
             photoCanvas.height = arCanvas.height;
             const photoCtx = photoCanvas.getContext('2d');
             
-            // Draw video frame
-            photoCtx.drawImage(arVideo, 0, 0);
+            photoCtx.drawImage(arVideo, 0, 0, photoCanvas.width, photoCanvas.height);
             
-            // Draw AR overlay
-            photoCtx.drawImage(arCanvas, 0, 0);
+            if (modelLoaded && renderer) {
+                photoCtx.drawImage(renderer.domElement, 0, 0);
+            }
             
-            // Add watermark
             photoCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            photoCtx.fillRect(0, photoCanvas.height - 60, photoCanvas.width, 60);
+            photoCtx.fillRect(0, photoCanvas.height - 80, photoCanvas.width, 80);
             photoCtx.fillStyle = 'white';
-            photoCtx.font = 'bold 24px Arial';
-            photoCtx.fillText('🕌 Taj Mahal', 20, photoCanvas.height - 30);
-            photoCtx.font = '16px Arial';
-            photoCtx.fillText(new Date().toLocaleDateString(), 20, photoCanvas.height - 10);
+            photoCtx.font = 'bold 32px Arial';
+            photoCtx.fillText('🏯 Red Fort AR', 30, photoCanvas.height - 40);
+            photoCtx.font = '20px Arial';
+            photoCtx.fillText(new Date().toLocaleDateString(), 30, photoCanvas.height - 15);
             
             capturedPhotoData = photoCanvas.toDataURL('image/png');
             document.getElementById('capturedPhoto').src = capturedPhotoData;
@@ -384,7 +430,7 @@
 
         function downloadPhoto() {
             const link = document.createElement('a');
-            link.download = `taj-mahal-${Date.now()}.png`;
+            link.download = `red-fort-ar-${Date.now()}.png`;
             link.href = capturedPhotoData;
             link.click();
         }
@@ -394,15 +440,15 @@
                 fetch(capturedPhotoData)
                     .then(res => res.blob())
                     .then(blob => {
-                        const file = new File([blob], 'taj-mahal.png', { type: 'image/png' });
+                        const file = new File([blob], 'red-fort-ar.png', { type: 'image/png' });
                         navigator.share({
-                            title: 'Taj Mahal AR Experience',
-                            text: 'Check out my AR photo at the Taj Mahal!',
+                            title: 'Red Fort AR Experience',
+                            text: 'Check out my AR photo with the Red Fort!',
                             files: [file]
                         });
                     });
             } else {
-                alert('Share feature not supported. Photo has been copied!');
+                alert('Share feature not supported on this device.');
             }
         }
 
@@ -410,12 +456,11 @@
             document.getElementById('photoModal').classList.add('hidden');
         }
 
-        // Share monument
         function shareMonument() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'Taj Mahal AR Experience',
-                    text: 'Explore the Taj Mahal in AR!',
+                    title: 'Red Fort AR Experience',
+                    text: 'Explore the Red Fort in AR!',
                     url: window.location.href
                 });
             } else {
@@ -424,7 +469,6 @@
             }
         }
 
-        // Cleanup
         window.addEventListener('beforeunload', () => {
             stopAROverlay();
             if (isPlaying) window.speechSynthesis.cancel();
